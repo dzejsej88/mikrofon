@@ -14,13 +14,10 @@ MIKROFON="$HOME/.local/bin/mikrofon"
 # Uruchom mikrofon jeśli jeszcze nie działa
 if ! pgrep -f "python3.*mikrofon" > /dev/null 2>&1; then
     DISPLAY="${DISPLAY:-:0}" "$MIKROFON" &
-    MIKROFON_PID=$!
 fi
 
 # Uruchom WebCord i poczekaj na jego zakończenie
 "$APPIMAGE" "$@"
 
-# Ubij mikrofon po wyjściu z WebCord
-if [ -n "$MIKROFON_PID" ]; then
-    kill "$MIKROFON_PID" 2>/dev/null
-fi
+# Ubij mikrofon po wyjściu z WebCord (zawsze, niezależnie kto go uruchomił)
+pkill -f "python3.*mikrofon" 2>/dev/null
