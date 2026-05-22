@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Uruchamia mikrofon + WebCord razem.
+# Po zamknięciu WebCord — ubija mikrofon.
+
+# Bierz najnowszy WebCord AppImage (automatycznie po aktualizacji)
+APPIMAGE=$(ls -t "$HOME"/WebCord-*-x64.AppImage 2>/dev/null | head -1)
+
+if [ -z "$APPIMAGE" ]; then
+    echo "Nie znaleziono WebCord-*-x64.AppImage w $HOME" >&2
+    exit 1
+fi
+MIKROFON="$HOME/.local/bin/mikrofon"
+
+# Uruchom mikrofon jeśli jeszcze nie działa
+if ! pgrep -f "python3.*mikrofon" > /dev/null 2>&1; then
+    DISPLAY="${DISPLAY:-:0}" "$MIKROFON" &
+    MIKROFON_PID=$!
+fi
+
+# Uruchom WebCord i poczekaj na jego zakończenie
+"$APPIMAGE" "$@"
+
+# Ubij mikrofon po wyjściu z WebCord
+if [ -n "$MIKROFON_PID" ]; then
+    kill "$MIKROFON_PID" 2>/dev/null
+fi
