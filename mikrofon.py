@@ -17,7 +17,7 @@ from PyQt6.QtWidgets import QApplication, QWidget, QMenu
 from PyQt6.QtCore import Qt, QTimer, QProcess, QRectF, QPointF
 from PyQt6.QtGui import (
     QPainter, QColor, QBrush, QPen,
-    QRadialGradient, QPainterPath,
+    QRadialGradient, QPainterPath, QPoint,
 )
 
 SIZE = 120  # rozmiar widgetu [px]
@@ -33,7 +33,7 @@ def get_mute_state() -> bool | None:
             capture_output=True, text=True, timeout=1,
         )
         return "yes" in r.stdout.lower()
-    except Exception:
+    except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
         return None
 
 
@@ -41,6 +41,7 @@ def toggle_mute() -> None:
     subprocess.run(
         ["pactl", "set-source-mute", "@DEFAULT_SOURCE@", "toggle"],
         capture_output=True,
+        timeout=2,
     )
 
 
@@ -50,7 +51,7 @@ class MikrofonWidget(QWidget):
     def __init__(self) -> None:
         super().__init__()
         self.muted: bool = False
-        self._drag_pos = None
+        self._drag_pos: QPoint | None = None
         self._flash: int = 0          # klatki animacji zmiany stanu
 
         # timer tylko do odliczania klatek rozbłysku (nie do pollingu)
@@ -86,6 +87,9 @@ class MikrofonWidget(QWidget):
 
     def _setup_subscriber(self) -> None:
         """Uruchamia `pactl subscribe` i słucha zdarzeń zmiany źródła."""
+        if hasattr(self, "_proc"):
+            self._proc.finished.disconnect()
+            self._proc.deleteLater()
         self._proc = QProcess(self)
         self._proc.readyReadStandardOutput.connect(self._on_pactl_event)
         self._proc.finished.connect(self._on_subscriber_died)
@@ -176,8 +180,6 @@ class MikrofonWidget(QWidget):
                 QPointF(cx + r - m, cy + r - m),
             )
 
-        p.end()
-
     def _draw_mic(self, p: QPainter, cx: float, cy: float, r: float) -> None:
         s = r / 25.0          # skala względem promienia
 
@@ -242,8 +244,7 @@ class MikrofonWidget(QWidget):
     def _show_menu(self, pos) -> None:
         menu = QMenu(self)
         state_txt = "🔴  Wyciszony" if self.muted else "🟢  Aktywny"
-        info = menu.addAction(state_txt)
-        info.setEnabled(False)
+        menu.addAction(state_txt).setEnabled(False)
         menu.addSeparator()
         toggle_act = menu.addAction("Wycisz / Odcisz  (lub 2× klik)")
         menu.addSeparator()
