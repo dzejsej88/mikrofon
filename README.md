@@ -52,3 +52,20 @@ mikrofon &
 ```bash
 cp ~/mikrofon/mikrofon.py ~/.local/bin/mikrofon
 ```
+
+## Integracja z WebCord
+
+Repo zawiera skrypt `webcord` — odpala mikrofon razem z WebCord i zamyka go gdy wyjdziesz z WebCord.
+
+**Wymagania:** WebCord jako AppImage w katalogu domowym (`~/WebCord-*-x64.AppImage`).
+
+```bash
+cp webcord ~/.local/bin/webcord
+chmod +x ~/.local/bin/webcord
+```
+
+Skrypt automatycznie wykrywa najnowszą wersję AppImage, więc po aktualizacji WebCord nie trzeba nic zmieniać.
+
+```bash
+webcord
+```
