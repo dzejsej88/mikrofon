@@ -14,10 +14,10 @@ import sys
 import subprocess
 
 from PyQt6.QtWidgets import QApplication, QWidget, QMenu
-from PyQt6.QtCore import Qt, QTimer, QProcess, QRectF, QPointF
+from PyQt6.QtCore import Qt, QTimer, QProcess, QRectF, QPointF, QPoint
 from PyQt6.QtGui import (
     QPainter, QColor, QBrush, QPen,
-    QRadialGradient, QPainterPath, QPoint,
+    QRadialGradient, QPainterPath,
 )
 
 SIZE = 120  # rozmiar widgetu [px]
