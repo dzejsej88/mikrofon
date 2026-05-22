@@ -27,8 +27,8 @@ pip install PyQt6
 
 ```bash
 # Sklonuj repo
-git clone https://github.com/dzejsej88/mikrofon.git
-cd mikrofon
+git clone https://github.com/dzejsej88/mikrofon.git ~/dev/mikrofon
+cd ~/dev/mikrofon
 
 # Wstaw do PATH
 cp mikrofon.py ~/.local/bin/mikrofon
@@ -50,7 +50,7 @@ mikrofon &
 ## Aktualizacja po zmianach w kodzie
 
 ```bash
-cp ~/mikrofon/mikrofon.py ~/.local/bin/mikrofon
+cp ~/dev/mikrofon/mikrofon.py ~/.local/bin/mikrofon
 ```
 
 ## Integracja z WebCord
